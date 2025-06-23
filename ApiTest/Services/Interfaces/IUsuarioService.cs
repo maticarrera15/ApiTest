@@ -15,5 +15,9 @@ namespace ApiTest.Services.Interfaces
         Task<DataResponseDto<string>> Login(LoginDto logDto);
 
         Task<DataResponseDto<Usuario>> DeleteUser(UsuarioDto user);
+
+        Task<DataResponseDto<List<Usuario>>> GetUsers();
+
+
     }
 }

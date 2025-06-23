@@ -37,5 +37,11 @@ namespace ApiTest.Repositories.Implementaciones
             await _context.SaveChangesAsync();
         }
 
+        public async Task<List<Usuario>> GetUsers()
+        {           
+            return await _context.Usuarios.Include(p => p.oPerfil).ToListAsync();
+        }
+
+
     }
 }
