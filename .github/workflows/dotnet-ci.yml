@@ -17,7 +17,7 @@ jobs:
       - name: ⚙️ Configurar .NET
         uses: actions/setup-dotnet@v3
         with:
-          dotnet-version: 6.0.x
+          dotnet-version: 8.0.x
 
       - name: 📦 Restaurar dependencias
         run: dotnet restore ApiTest/ApiTest.csproj
