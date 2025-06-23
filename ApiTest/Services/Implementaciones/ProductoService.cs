@@ -24,7 +24,6 @@ namespace ApiTest.Services.Implementaciones
         {
             try
             {
-                //comment de prueba
                 var producto = await _repo.ObtenerProducto(prod.IdProducto);
 
                 if (producto == null)
