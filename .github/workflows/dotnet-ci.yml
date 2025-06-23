@@ -1,0 +1,29 @@
+﻿name: Build and Test .NET API
+
+on:
+  push:
+    branches: [ dev, test ]  # ramas que activan la CI
+  pull_request:
+    branches: [ dev, test ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 🔄 Clonar repositorio
+        uses: actions/checkout@v3
+
+      - name: ⚙️ Configurar .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 6.0.x
+
+      - name: 📦 Restaurar dependencias
+        run: dotnet restore
+
+      - name: 🛠️ Compilar solución
+        run: dotnet build --no-restore --configuration Release
+
+      # - name: ✅ Ejecutar tests (si tenés)
+      #   run: dotnet test --no-build --verbosity normal
