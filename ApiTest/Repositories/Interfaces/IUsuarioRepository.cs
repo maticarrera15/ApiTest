@@ -11,5 +11,8 @@ namespace ApiTest.Repositories.Interfaces
         Task GuardarUsuarioAsync();
 
         Task EliminarUsuario(Usuario user);
+
+        Task<List<Usuario>> GetUsers();
+
     }
 }

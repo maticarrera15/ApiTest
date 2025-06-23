@@ -103,5 +103,26 @@ namespace ApiTest.Controllers
                 return StatusCode(StatusCodes.Status200OK, new DefaultResponse(ex.Message));
             }
         }
+
+        [HttpGet]
+        [Route("getAll")]
+        public async Task<IActionResult> GetAll()
+        {
+            try
+            {
+                var result = await _UsuarioService.GetUsers();
+
+                if (result.Status == HttpStatusCode.OK.ToString())
+                {
+                    return StatusCode(StatusCodes.Status200OK, result);
+                }
+                else
+                    return BadRequest(result.Msg);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status200OK, new DefaultResponse(ex.Message));
+            }
+        }
     }
 }

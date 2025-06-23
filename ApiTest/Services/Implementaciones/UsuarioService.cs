@@ -177,5 +177,18 @@ namespace ApiTest.Services.Implementaciones
             };
 
         }
+
+        public async Task<DataResponseDto<List<Usuario>>> GetUsers()
+        {
+            var resp = await _userRepo.GetUsers();
+
+            return new DataResponseDto<List<Usuario>>
+            {
+                Status = HttpStatusCode.OK.ToString(),
+                Msg = "Listado de usuarios",
+                Data = resp,
+                exist = true,
+            };
+        }
     }
 }
