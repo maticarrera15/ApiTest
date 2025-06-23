@@ -16,6 +16,7 @@ namespace ApiTest.Models
         {
         }
 
+        public virtual DbSet<Perfil> Perfils { get; set; } = null!;
         public virtual DbSet<Categoria> Categoria { get; set; } = null!;
         public virtual DbSet<Producto> Productos { get; set; } = null!;
         public virtual DbSet<Usuario> Usuarios { get; set; } = null!;
@@ -105,6 +106,25 @@ namespace ApiTest.Models
                     .HasMaxLength(200)
                     .IsUnicode(false)
                     .HasColumnName("Usuario");
+
+                entity.HasOne(d => d.oPerfil)
+                    .WithMany(p => p.Users)
+                    .HasForeignKey(d => d.IdPerfil)
+                    .HasConstraintName("FK_IDPERFIL");
+
+            });
+
+
+            modelBuilder.Entity<Perfil>(entity =>
+            {
+                entity.HasKey(e => e.IdPerfil)
+                    .HasName("PK__Perfil__C7BD5CC11C271C83");
+
+                entity.ToTable("Perfil");
+
+                entity.Property(e => e.Descripcion)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
             });
 
             OnModelCreatingPartial(modelBuilder);
