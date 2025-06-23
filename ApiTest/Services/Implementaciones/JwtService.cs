@@ -12,9 +12,11 @@ namespace ApiTest.Services.Implementaciones
     public class JwtService : IJwtService
     {
         private readonly string? secretKey;
+        private readonly string? issuer;
         public JwtService(IConfiguration config)
         {
             secretKey = config.GetSection("settings").GetSection("secretKey").ToString();
+            issuer = config.GetSection("settings").GetSection("issuer").ToString();
         }
         public string GenerarToken(Usuario user)
         {
@@ -30,7 +32,8 @@ namespace ApiTest.Services.Implementaciones
                 var tokenDesc = new SecurityTokenDescriptor
                 {
                     Subject = claims,
-                    Expires = DateTime.UtcNow.AddMinutes(5),
+                    Expires = DateTime.UtcNow.AddMinutes(25),
+                    Issuer = issuer,
                     SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(keyBytes), SecurityAlgorithms.HmacSha256Signature)
                 };
 

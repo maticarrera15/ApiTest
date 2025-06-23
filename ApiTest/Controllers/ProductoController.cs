@@ -11,7 +11,8 @@ namespace ApiTest.Controllers
 {
     [EnableCors("ReglasCors")]
     [Route("api/[controller]")]
-    [ApiController]    
+    [ApiController]
+    [Authorize]
     public class ProductoController : ControllerBase
     {
         public readonly IProductoService _productoService;

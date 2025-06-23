@@ -17,6 +17,7 @@ builder.Configuration.AddJsonFile("appsettings.json");
 //var secretKey = builder.Configuration["settings:secretKey"];
 var secretKey = builder.Configuration.GetSection("settings").GetSection("secretKey").ToString();
 var keyBytes = Encoding.UTF8.GetBytes(secretKey);
+var issuer = builder.Configuration.GetSection("settings").GetSection("issuer").ToString();
 
 builder.Services.AddAuthentication(config =>
 {
@@ -31,6 +32,7 @@ builder.Services.AddAuthentication(config =>
         ValidateIssuerSigningKey = true,
         IssuerSigningKey = new SymmetricSecurityKey(keyBytes),
         ValidateIssuer = true,
+        ValidIssuer = issuer,
         ValidateAudience = false,
     };
 });
