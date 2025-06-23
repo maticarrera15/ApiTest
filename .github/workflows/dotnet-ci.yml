@@ -20,10 +20,10 @@ jobs:
           dotnet-version: 6.0.x
 
       - name: 📦 Restaurar dependencias
-        run: dotnet restore
+        run: dotnet restore ApiTest/ApiTest.csproj
 
       - name: 🛠️ Compilar solución
-        run: dotnet build --no-restore --configuration Release
+        run: dotnet build ApiTest/ApiTest.csproj --no-restore --configuration Release
 
       # - name: ✅ Ejecutar tests (si tenés)
-      #   run: dotnet test --no-build --verbosity normal
+      #   run: dotnet test ApiTest/ApiTest.csproj --no-build --verbosity normal
