@@ -13,7 +13,10 @@ using ApiTest.Services.Implementaciones;
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Configuration.AddJsonFile("appsettings.json");
+builder.Configuration
+    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables(); // Esto es lo que permite leer desde Azure App Settings
+
 //var secretKey = builder.Configuration["settings:secretKey"];
 var secretKey = builder.Configuration.GetSection("settings").GetSection("secretKey").ToString();
 var keyBytes = Encoding.UTF8.GetBytes(secretKey);
@@ -49,6 +52,7 @@ builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IJwtService, JwtService>();
 
+Console.WriteLine("Cadena de conexión leída: " + builder.Configuration.GetConnectionString("cadenaSQL"));
 
 builder.Services.AddDbContext<TESTAPIContext>(opt => opt.UseSqlServer(builder.Configuration.GetConnectionString("cadenaSQL")));
 
