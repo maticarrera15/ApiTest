@@ -11,11 +11,13 @@ namespace ApiTest.Services.Implementaciones
     {
         private readonly IUsuarioRepository _userRepo;
         private readonly IJwtService _jwtService;
+        private readonly IEmailService _emailService;
 
-        public UsuarioService(IUsuarioRepository userRepo, IJwtService jwtService) 
+        public UsuarioService(IUsuarioRepository userRepo, IJwtService jwtService, IEmailService emailService) 
         {
             _userRepo = userRepo;       
             _jwtService = jwtService;
+            _emailService = emailService;
         }
 
         public async Task<DataResponseDto<Usuario>> GetUser(UsuarioDto userDto) 
@@ -188,6 +190,39 @@ namespace ApiTest.Services.Implementaciones
                 Msg = "Listado de usuarios",
                 Data = resp,
                 exist = true,
+            };
+        }
+
+        public async Task<DataResponseDto<Usuario>> RecoverPsw(UsuarioDto userDto)
+        {
+            var resp = await this.GetUser(userDto);
+
+            if (resp.exist == false)
+            {
+                return new DataResponseDto<Usuario>
+                {
+                    Status = HttpStatusCode.NotFound.ToString(),
+                    Msg = "Usuario Incorrecto",
+                    exist = false,
+                };
+            }
+
+            //Generar codigo random y debería guardarlo en base.
+            var codigo = new Random().Next(100000,999999).ToString();
+
+            //Si el usuario es correcto, mandar mail con codigo para resetear contraseña (que deberia ser otro endpoint POST).
+            //Guardar en token. Campo que podría estar hasheado.
+            resp.Data?.Token = codigo;
+            await _userRepo.GuardarUsuarioAsync();
+
+            await _emailService.SendEmailAsync(resp.Data.Email, "Código de recuperación", $"Tu código es: {codigo}");
+
+            return new DataResponseDto<Usuario>
+            {
+                Status = HttpStatusCode.OK.ToString(),
+                Msg = "Se ha enviado un código a tu email",
+                exist = true,
+                Data = resp.Data,
             };
         }
     }
