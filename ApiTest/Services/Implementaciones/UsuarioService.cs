@@ -36,7 +36,6 @@ namespace ApiTest.Services.Implementaciones
                 {
                     Status = HttpStatusCode.NotFound.ToString(),
                     Msg = "Usuario no existe en base",
-                    Data = user,
                     exist = false,
                 };
             }
@@ -197,7 +196,7 @@ namespace ApiTest.Services.Implementaciones
         {
             var resp = await this.GetUser(userDto);
 
-            if (resp.exist == false)
+            if (resp.Data == null)
             {
                 return new DataResponseDto<Usuario>
                 {
@@ -207,39 +206,40 @@ namespace ApiTest.Services.Implementaciones
                 };
             }
 
-            //Generar codigo random y debería guardarlo en base.
-            var codigo = new Random().Next(100000,999999).ToString();
-            var fechaLimite = DateTime.Now.AddHours(1);
-
-            //Si el usuario es correcto, mandar mail con codigo para resetear contraseña (que deberia ser otro endpoint POST).
-            //Guardar en token. Campo que podría estar hasheado.
-            resp.Data?.Token = codigo;
-            resp.Data?.DateCodeLimit = fechaLimite;
-            await _userRepo.GuardarUsuarioAsync();
-
-            await _emailService.SendEmailCodePsw(resp.Data.Email, codigo);
-
-            return new DataResponseDto<Usuario>
+            else 
             {
-                Status = HttpStatusCode.OK.ToString(),
-                Msg = "Se ha enviado un código a tu email",
-                exist = true,
-                Data = resp.Data,
-            };
+                var codigo = new Random().Next(100000, 999999).ToString();
+                var fechaLimite = DateTime.Now.AddHours(1);
+
+                resp.Data.Token = codigo;
+                resp.Data.DateCodeLimit = fechaLimite;
+                await _userRepo.GuardarUsuarioAsync();
+
+                await _emailService.SendEmailCodePsw(resp.Data.Email, codigo);
+
+                return new DataResponseDto<Usuario>
+                {
+                    Status = HttpStatusCode.OK.ToString(),
+                    Msg = "Se ha enviado un código a tu email",
+                    exist = true,
+                    Data = resp.Data,
+                };
+            }            
+            
         }
 
         public async Task<DataResponseDto<Usuario>> CodeValid(UsuarioDto userDto)
         {
             var resp = await this.GetUser(userDto);
 
-            if (resp.exist == false)
+            if (resp.Data == null)
             {
                 return resp;                
             }
 
-            if(resp.Data?.DateCodeLimit != null && resp.Data?.DateCodeLimit >= DateTime.Now)
+            else if (resp.Data.DateCodeLimit != null && resp.Data.DateCodeLimit >= DateTime.Now)
             {
-                if(resp.Data?.Token == userDto.codeValidation)
+                if (resp.Data?.Token == userDto.codeValidation)
                 {
                     return new DataResponseDto<Usuario>
                     {
@@ -269,9 +269,6 @@ namespace ApiTest.Services.Implementaciones
                     exist = false,
                 };
             }
-
-
-
                
         }
 
