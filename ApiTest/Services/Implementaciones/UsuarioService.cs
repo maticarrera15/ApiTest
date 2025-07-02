@@ -215,6 +215,7 @@ namespace ApiTest.Services.Implementaciones
                 resp.Data.DateCodeLimit = fechaLimite;
                 await _userRepo.GuardarUsuarioAsync();
 
+
                 await _emailService.SendEmailCodePsw(resp.Data.Email, codigo);
 
                 return new DataResponseDto<Usuario>
@@ -276,21 +277,24 @@ namespace ApiTest.Services.Implementaciones
         {
             var resp = await this.GetUser(userDto);
 
-            if (resp.exist == false)
+            if (resp.Data == null)
             {
                 return resp;
             }
-
-            resp.Data?.Password = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
-            await _userRepo.GuardarUsuarioAsync();
-
-            return new DataResponseDto<Usuario>
+            else
             {
-                Status = HttpStatusCode.OK.ToString(),
-                Msg = "Contraseña actualizada con éxito.",
-                Data = resp.Data,
-                exist = true,
-            };        
+                resp.Data?.Password = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
+                await _userRepo.GuardarUsuarioAsync();
+
+                return new DataResponseDto<Usuario>
+                {
+                    Status = HttpStatusCode.OK.ToString(),
+                    Msg = "Contraseña actualizada con éxito.",
+                    Data = resp.Data,
+                    exist = true,
+                };
+            }
+                  
 
         }
     }
