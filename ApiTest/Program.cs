@@ -51,6 +51,7 @@ builder.Services.AddScoped<IProductoService, ProductoService>();
 builder.Services.AddScoped<IUsuarioService, UsuarioService>();
 builder.Services.AddScoped<IUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<IJwtService, JwtService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 Console.WriteLine("Cadena de conexión leída: " + builder.Configuration.GetConnectionString("cadenaSQL"));
 
@@ -71,12 +72,6 @@ builder.Services.AddCors(opt =>
 });
 
 var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
-    
-//}
 
 app.UseSwagger();
 app.UseSwaggerUI();

@@ -11,11 +11,13 @@ namespace ApiTest.Services.Implementaciones
     {
         private readonly IUsuarioRepository _userRepo;
         private readonly IJwtService _jwtService;
+        private readonly IEmailService _emailService;
 
-        public UsuarioService(IUsuarioRepository userRepo, IJwtService jwtService) 
+        public UsuarioService(IUsuarioRepository userRepo, IJwtService jwtService, IEmailService emailService) 
         {
             _userRepo = userRepo;       
             _jwtService = jwtService;
+            _emailService = emailService;
         }
 
         public async Task<DataResponseDto<Usuario>> GetUser(UsuarioDto userDto) 
@@ -34,7 +36,6 @@ namespace ApiTest.Services.Implementaciones
                 {
                     Status = HttpStatusCode.NotFound.ToString(),
                     Msg = "Usuario no existe en base",
-                    Data = user,
                     exist = false,
                 };
             }
@@ -189,6 +190,108 @@ namespace ApiTest.Services.Implementaciones
                 Data = resp,
                 exist = true,
             };
+        }
+
+        public async Task<DataResponseDto<Usuario>> RecoverPsw(UsuarioDto userDto)
+        {
+            var resp = await this.GetUser(userDto);
+
+            if (resp.Data == null)
+            {
+                return new DataResponseDto<Usuario>
+                {
+                    Status = HttpStatusCode.NotFound.ToString(),
+                    Msg = "Usuario Incorrecto",
+                    exist = false,
+                };
+            }
+
+            else 
+            {
+                var codigo = new Random().Next(100000, 999999).ToString();
+                var fechaLimite = DateTime.Now.AddHours(1);
+
+                resp.Data.Token = codigo;
+                resp.Data.DateCodeLimit = fechaLimite;
+                await _userRepo.GuardarUsuarioAsync();
+
+                await _emailService.SendEmailCodePsw(resp.Data.Email, codigo);
+
+                return new DataResponseDto<Usuario>
+                {
+                    Status = HttpStatusCode.OK.ToString(),
+                    Msg = "Se ha enviado un código a tu email",
+                    exist = true,
+                    Data = resp.Data,
+                };
+            }            
+            
+        }
+
+        public async Task<DataResponseDto<Usuario>> CodeValid(UsuarioDto userDto)
+        {
+            var resp = await this.GetUser(userDto);
+
+            if (resp.Data == null)
+            {
+                return resp;                
+            }
+
+            else if (resp.Data.DateCodeLimit != null && resp.Data.DateCodeLimit >= DateTime.Now)
+            {
+                if (resp.Data?.Token == userDto.codeValidation)
+                {
+                    return new DataResponseDto<Usuario>
+                    {
+                        Status = HttpStatusCode.OK.ToString(),
+                        Msg = "Codigo válido.",
+                        Data = resp.Data,
+                        exist = true,
+                    };
+                }
+                return new DataResponseDto<Usuario>
+                {
+                    Status = HttpStatusCode.Forbidden.ToString(),
+                    Msg = "Codigo incorrecto.",
+                    Data = resp.Data,
+                    exist = false,
+                };
+
+            }
+
+            else
+            {
+                return new DataResponseDto<Usuario>
+                {
+                    Status = HttpStatusCode.NotFound.ToString(),
+                    Msg = "Codigo expirado.",
+                    Data = resp.Data,
+                    exist = false,
+                };
+            }
+               
+        }
+
+        public async Task<DataResponseDto<Usuario>> ResetPsw(UsuarioDto userDto)
+        {
+            var resp = await this.GetUser(userDto);
+
+            if (resp.exist == false)
+            {
+                return resp;
+            }
+
+            resp.Data?.Password = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
+            await _userRepo.GuardarUsuarioAsync();
+
+            return new DataResponseDto<Usuario>
+            {
+                Status = HttpStatusCode.OK.ToString(),
+                Msg = "Contraseña actualizada con éxito.",
+                Data = resp.Data,
+                exist = true,
+            };        
+
         }
     }
 }

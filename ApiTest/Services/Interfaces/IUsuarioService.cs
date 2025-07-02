@@ -18,6 +18,11 @@ namespace ApiTest.Services.Interfaces
 
         Task<DataResponseDto<List<Usuario>>> GetUsers();
 
+        Task<DataResponseDto<Usuario>> RecoverPsw(UsuarioDto userDto);
+
+        Task<DataResponseDto<Usuario>> CodeValid(UsuarioDto userDto);
+
+        Task<DataResponseDto<Usuario>> ResetPsw(UsuarioDto userDto);
 
     }
 }

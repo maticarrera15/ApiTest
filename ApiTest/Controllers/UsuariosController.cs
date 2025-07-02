@@ -124,5 +124,67 @@ namespace ApiTest.Controllers
                 return StatusCode(StatusCodes.Status200OK, new DefaultResponse(ex.Message));
             }
         }
+        [HttpPost]
+        [Route("sendCode")]
+        public async Task<IActionResult> RecoverPsw([FromBody] UsuarioDto user)
+        {
+            try
+            {
+                var result = await _UsuarioService.RecoverPsw(user);
+
+                if (result.Status == HttpStatusCode.OK.ToString())
+                {
+                    return StatusCode(StatusCodes.Status200OK, result);
+                }
+                else
+                    return BadRequest(result.Msg);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status200OK, new DefaultResponse(ex.Message));
+            }
+        }
+
+        [HttpPost]
+        [Route("validCode")]
+        public async Task<IActionResult> CodeValid([FromBody] UsuarioDto user)
+        {
+            try
+            {
+                var result = await _UsuarioService.CodeValid(user);
+
+                if (result.Status == HttpStatusCode.OK.ToString())
+                {
+                    return StatusCode(StatusCodes.Status200OK, result);
+                }
+                else
+                    return BadRequest(result.Msg);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status200OK, new DefaultResponse(ex.Message));
+            }
+        }
+
+        [HttpPost]
+        [Route("resetPsw")]
+        public async Task<IActionResult> ResetPsw([FromBody] UsuarioDto user)
+        {
+            try
+            {
+                var result = await _UsuarioService.ResetPsw(user);
+
+                if (result.Status == HttpStatusCode.OK.ToString())
+                {
+                    return StatusCode(StatusCodes.Status200OK, result);
+                }
+                else
+                    return BadRequest(result.Msg);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status200OK, new DefaultResponse(ex.Message));
+            }
+        }
     }
 }
