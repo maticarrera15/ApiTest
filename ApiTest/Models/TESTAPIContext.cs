@@ -16,10 +16,10 @@ namespace ApiTest.Models
         {
         }
 
+        public virtual DbSet<Usuario> Usuarios { get; set; } = null!;
         public virtual DbSet<Perfil> Perfils { get; set; } = null!;
         public virtual DbSet<Categoria> Categoria { get; set; } = null!;
         public virtual DbSet<Producto> Productos { get; set; } = null!;
-        public virtual DbSet<Usuario> Usuarios { get; set; } = null!;
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -32,6 +32,53 @@ namespace ApiTest.Models
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
+            modelBuilder.Entity<Usuario>(entity =>
+            {
+                entity.HasKey(e => e.IdUsuario)
+                    .HasName("PK__Usuario__5B65BF97E69976C1");
+
+                entity.ToTable("Usuario");
+
+                entity.Property(e => e.Apellido)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.DateCodeLimit).HasColumnType("datetime");
+
+                entity.Property(e => e.Email)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.FechaAlta).HasColumnType("datetime");
+
+                entity.Property(e => e.FechaBaja).HasColumnType("datetime");
+
+                entity.Property(e => e.FechaNacimiento).HasColumnType("datetime");
+
+                entity.Property(e => e.Nombre)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Password)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.Token)
+                    .HasMaxLength(200)
+                    .IsUnicode(false);
+
+                entity.Property(e => e.User)
+                    .HasMaxLength(200)
+                    .IsUnicode(false)
+                    .HasColumnName("Usuario");
+
+                entity.HasOne(d => d.oPerfil)
+                        .WithMany(p => p.Users)
+                        .HasForeignKey(d => d.IdPerfil)
+                        .HasConstraintName("FK_IDPERFIL");
+
+            });
+
             modelBuilder.Entity<Categoria>(entity =>
             {
                 entity.HasKey(e => e.IdCategoria)
@@ -69,52 +116,6 @@ namespace ApiTest.Models
                     .HasConstraintName("FK_IDCATEGORIA");
             });
 
-            modelBuilder.Entity<Usuario>(entity =>
-            {
-                entity.HasKey(e => e.IdUsuario)
-                    .HasName("PK__Usuario__5B65BF97E69976C1");
-
-                entity.ToTable("Usuario");
-
-                entity.Property(e => e.Apellido)
-                    .HasMaxLength(200)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Email)
-                    .HasMaxLength(200)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.FechaAlta).HasColumnType("datetime");
-
-                entity.Property(e => e.FechaBaja).HasColumnType("datetime");
-
-                entity.Property(e => e.FechaNacimiento).HasColumnType("datetime");
-
-                entity.Property(e => e.Nombre)
-                    .HasMaxLength(200)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Password)
-                    .HasMaxLength(200)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Token)
-                    .HasMaxLength(200)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.User)
-                    .HasMaxLength(200)
-                    .IsUnicode(false)
-                    .HasColumnName("Usuario");
-
-                entity.HasOne(d => d.oPerfil)
-                    .WithMany(p => p.Users)
-                    .HasForeignKey(d => d.IdPerfil)
-                    .HasConstraintName("FK_IDPERFIL");
-
-            });
-
-
             modelBuilder.Entity<Perfil>(entity =>
             {
                 entity.HasKey(e => e.IdPerfil)
@@ -126,6 +127,7 @@ namespace ApiTest.Models
                     .HasMaxLength(200)
                     .IsUnicode(false);
             });
+
 
             OnModelCreatingPartial(modelBuilder);
         }

@@ -209,13 +209,15 @@ namespace ApiTest.Services.Implementaciones
 
             //Generar codigo random y debería guardarlo en base.
             var codigo = new Random().Next(100000,999999).ToString();
+            var fechaLimite = DateTime.Now.AddHours(1);
 
             //Si el usuario es correcto, mandar mail con codigo para resetear contraseña (que deberia ser otro endpoint POST).
             //Guardar en token. Campo que podría estar hasheado.
             resp.Data?.Token = codigo;
+            resp.Data?.DateCodeLimit = fechaLimite;
             await _userRepo.GuardarUsuarioAsync();
 
-            await _emailService.SendEmailAsync(resp.Data.Email, "Código de recuperación", $"Tu código es: {codigo}");
+            await _emailService.SendEmailCodePsw(resp.Data.Email, codigo);
 
             return new DataResponseDto<Usuario>
             {
@@ -224,6 +226,75 @@ namespace ApiTest.Services.Implementaciones
                 exist = true,
                 Data = resp.Data,
             };
+        }
+
+        public async Task<DataResponseDto<Usuario>> CodeValid(UsuarioDto userDto)
+        {
+            var resp = await this.GetUser(userDto);
+
+            if (resp.exist == false)
+            {
+                return resp;                
+            }
+
+            if(resp.Data?.DateCodeLimit != null && resp.Data?.DateCodeLimit >= DateTime.Now)
+            {
+                if(resp.Data?.Token == userDto.codeValidation)
+                {
+                    return new DataResponseDto<Usuario>
+                    {
+                        Status = HttpStatusCode.OK.ToString(),
+                        Msg = "Codigo válido.",
+                        Data = resp.Data,
+                        exist = true,
+                    };
+                }
+                return new DataResponseDto<Usuario>
+                {
+                    Status = HttpStatusCode.Forbidden.ToString(),
+                    Msg = "Codigo incorrecto.",
+                    Data = resp.Data,
+                    exist = false,
+                };
+
+            }
+
+            else
+            {
+                return new DataResponseDto<Usuario>
+                {
+                    Status = HttpStatusCode.NotFound.ToString(),
+                    Msg = "Codigo expirado.",
+                    Data = resp.Data,
+                    exist = false,
+                };
+            }
+
+
+
+               
+        }
+
+        public async Task<DataResponseDto<Usuario>> ResetPsw(UsuarioDto userDto)
+        {
+            var resp = await this.GetUser(userDto);
+
+            if (resp.exist == false)
+            {
+                return resp;
+            }
+
+            resp.Data?.Password = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
+            await _userRepo.GuardarUsuarioAsync();
+
+            return new DataResponseDto<Usuario>
+            {
+                Status = HttpStatusCode.OK.ToString(),
+                Msg = "Contraseña actualizada con éxito.",
+                Data = resp.Data,
+                exist = true,
+            };        
+
         }
     }
 }

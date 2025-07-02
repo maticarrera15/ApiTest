@@ -9,5 +9,7 @@
         public string? Password { get; set; }
         public string? Email { get; set; }
         public DateTime? FechaAlta { get; set; }
+
+        public string? codeValidation { get; set; }
     }
 }

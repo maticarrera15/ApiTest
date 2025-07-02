@@ -17,6 +17,7 @@ namespace ApiTest.Models
         public DateTime? FechaAlta { get; set; }
         public DateTime? FechaBaja { get; set; }
         public int? IdPerfil { get; set; }
+        public DateTime? DateCodeLimit { get; set; }
 
         public virtual Perfil? oPerfil { get; set; }
     }

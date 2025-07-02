@@ -24,5 +24,20 @@ namespace ApiTest.Services.Implementaciones
             //guardat en un secrets.json por ej.
             //psw generada en google rxqdvuyetxfxhhar
         }
+
+        public async Task SendEmailCodePsw(string to,string codigo)
+        {
+            var email = new MimeMessage();
+            email.From.Add(MailboxAddress.Parse("maticarrera15@gmail.com"));
+            email.To.Add(MailboxAddress.Parse(to));
+            email.Subject = "Código de recuperación de PASSWORD";
+            email.Body = new TextPart(MimeKit.Text.TextFormat.Text) { Text = $"El código para setear tu password es: {codigo}" };
+
+            using var smtp = new SmtpClient();
+            await smtp.ConnectAsync("smtp.gmail.com", 587, MailKit.Security.SecureSocketOptions.StartTls);
+            await smtp.AuthenticateAsync("maticarrera15@gmail.com", "rxqdvuyetxfxhhar");
+            await smtp.SendAsync(email);
+            await smtp.DisconnectAsync(true);
+        }
     }
 }
