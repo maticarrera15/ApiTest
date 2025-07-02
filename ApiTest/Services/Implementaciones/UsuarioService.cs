@@ -240,7 +240,7 @@ namespace ApiTest.Services.Implementaciones
 
             else if (resp.Data.DateCodeLimit != null && resp.Data.DateCodeLimit >= DateTime.Now)
             {
-                if (resp.Data?.Token == userDto.codeValidation)
+                if (resp.Data.Token == userDto.codeValidation)
                 {
                     return new DataResponseDto<Usuario>
                     {
@@ -283,7 +283,7 @@ namespace ApiTest.Services.Implementaciones
             }
             else
             {
-                resp.Data?.Password = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
+                resp.Data.Password = BCrypt.Net.BCrypt.HashPassword(userDto.Password);
                 await _userRepo.GuardarUsuarioAsync();
 
                 return new DataResponseDto<Usuario>
